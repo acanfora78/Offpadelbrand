@@ -69,3 +69,59 @@ filtered noise — no samples, nothing licensed. Its cut sheet mirrors
 Inter is self-hosted in `public/fonts/` and declared in `src/index.css`, rather
 than fetched from Google Fonts at render time — the renderer runs behind a
 TLS-intercepting proxy that headless Chrome does not trust.
+
+---
+
+# POV Court Film (offline cut)
+
+A second composition — the native-feeling TikTok concept, *"POV: hai appena
+scoperto il brand di padel che nessuno conosce."* 24s, same format.
+
+```bash
+npm run audio:pov                            # regenerate its soundtrack
+npm run render:pov                           # variant A
+npx remotion render src/index.ts OFFPADEL-POV-B out/pov-b.mp4
+```
+
+## Status: awaiting footage
+
+The concept is live action — two performers, a court, spoken dialogue, a ball
+strike. The project holds no footage, location plates, performers or voice
+recordings, so **five of the eight scenes are production slates**, not picture.
+
+| Scene | 00:00 | State |
+|---|---|---|
+| `OpeningHook` | 0.0–2.0 | slate |
+| `RacketReveal` | 2.0–5.0 | **carbon insert is real**, two-shot slated |
+| `MatchSequence` | 5.0–9.0 | slate |
+| `SlowMotionImpact` | 9.0–14.0 | slate |
+| `DialoguePayoff` | 14.0–17.0 | slate |
+| `ProductMontage` | 17.0–21.0 | **finished** |
+| `FinalBrand` | 21.0–23.0 | **finished** |
+| `LoopEnding` | 23.0–24.0 | slate |
+
+The slates carry the shot's own paperwork — slate, timecode, camera, action —
+so the cut plays at the right length and rhythm. To finish a scene, swap its
+`FootagePlate` for an `OffthreadVideo` inside the same component: timings,
+captions and audio are already built around these durations, so the edit does
+not move.
+
+See `docs/storyboard-court-film.html` for the shot list.
+
+## Variants
+
+Scene 01 is the only variable, so A/B/C render from one composition and one
+shoot. Lines live in `HOOK_VARIANTS` (`src/pov/config.ts`).
+
+## Captions
+
+Dialogue captions are burned in by design — most of the platform is watched
+muted on the first pass, and this story is carried by its dialogue. Sync points
+are in `dialogueFor()`; they are the frames to cut the recorded takes to.
+
+## Sound
+
+`scripts/generate-pov-audio.mjs` is a temp track in the proper sense: it fixes
+the arrangement, the ducks and every hit position, including the 200ms of true
+silence before the strike. Location sound, dialogue and licensed music lay
+against the same grid.

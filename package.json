@@ -32,7 +32,9 @@
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc",
     "audio": "node scripts/generate-audio.mjs",
-    "render": "remotion render OFFPADEL-AD out/offpadel-ad.mp4"
+    "audio:pov": "node scripts/generate-pov-audio.mjs",
+    "render": "remotion render OFFPADEL-AD out/offpadel-ad.mp4",
+    "render:pov": "remotion render OFFPADEL-POV-A out/offpadel-pov-a.mp4"
   },
   "sideEffects": [
     "*.css"
