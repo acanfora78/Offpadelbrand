@@ -1,31 +1,63 @@
 import React from "react";
-import { Img, staticFile, useCurrentFrame } from "remotion";
-import { cinematicIn } from "../lib/motion";
+import { Img, useCurrentFrame } from "remotion";
+import { ASSETS, COLORS, EASE, LOGO_CROP } from "../config";
+import { ramp } from "./motion";
 import { LightSweep } from "./LightSweep";
 
-const LOGO_SRC = staticFile("assets/logo/off-padel-logo-metallic-cream.png");
-const LOGO_ASPECT = 1774 / 887;
-
 /**
- * The official OFF Padel signature ships on its own cream field. We never
- * redraw or re-cut it — instead the whole plate is treated as one object:
- * feathered at the edges so it reads as a soft glow emerging from black,
- * with a light reflection animated on top (a separate gradient layer,
- * the logo pixels themselves are untouched).
+ * The official OFF Padel signature.
+ *
+ * The artwork is engraved metal on a cream field, and it is used exactly as
+ * delivered — never recoloured, re-cut, re-typed or substituted. The only
+ * treatment applied is a crop of the empty cream margin around the mark
+ * (see LOGO_CROP), so it can be placed as a tight plate; the plate is filled
+ * with the artwork's own backdrop colour so its edge is seamless wherever a
+ * cream field sits behind it.
  */
 export const LogoPlate: React.FC<{
-  delay: number;
-  width?: number;
+  width: number;
+  delay?: number;
   duration?: number;
+  sweep?: boolean;
   sweepDelay?: number;
-}> = ({ delay, width = 620, duration = 40, sweepDelay }) => {
+  /**
+   * Softens the plate's outer edge. The artwork's cream ground carries a faint
+   * radial falloff of its own, so against a flat cream field the plate would
+   * otherwise show as a slightly brighter rectangle. Feathering dissolves that
+   * boundary. Left off where the plate sits on black and its edge is meant to
+   * read as a deliberate printed border.
+   */
+  feather?: number;
+  style?: React.CSSProperties;
+}> = ({
+  width,
+  delay = 0,
+  duration = 26,
+  sweep = true,
+  sweepDelay,
+  feather = 0,
+  style,
+}) => {
   const frame = useCurrentFrame();
-  const progress = cinematicIn(frame, delay, duration);
-  const scale = 0.92 + progress * 0.08;
-  const height = width / LOGO_ASPECT;
+  const height = width / LOGO_CROP.aspect;
 
-  const maskImage =
-    "radial-gradient(ellipse 58% 58% at 50% 50%, black 35%, transparent 92%)";
+  const reveal = ramp({
+    frame,
+    from: 0,
+    to: 1,
+    delay,
+    duration,
+    easing: EASE.camera,
+  });
+
+  // The artwork is scaled so the cropped window exactly fills the plate.
+  const imgWidth = width / LOGO_CROP.width;
+  const imgHeight = imgWidth * (887 / 1774);
+
+  const featherMask = feather
+    ? `linear-gradient(to right, transparent 0%, black ${feather}%, black ${100 - feather}%, transparent 100%),
+       linear-gradient(to bottom, transparent 0%, black ${feather * 1.6}%, black ${100 - feather * 1.6}%, transparent 100%)`
+    : undefined;
 
   return (
     <div
@@ -33,30 +65,37 @@ export const LogoPlate: React.FC<{
         position: "relative",
         width,
         height,
-        opacity: progress,
-        transform: `scale(${scale})`,
+        overflow: "hidden",
+        backgroundColor: COLORS.logoPlate,
+        opacity: reveal,
+        WebkitMaskImage: featherMask,
+        maskImage: featherMask,
+        WebkitMaskComposite: feather ? "source-in" : undefined,
+        maskComposite: feather ? "intersect" : undefined,
+        ...style,
       }}
     >
-      <div
+      <Img
+        src={ASSETS.logo}
         style={{
           position: "absolute",
-          inset: 0,
-          WebkitMaskImage: maskImage,
-          maskImage,
+          width: imgWidth,
+          height: imgHeight,
+          left: -LOGO_CROP.left * imgWidth,
+          top: -LOGO_CROP.top * imgHeight,
+          maxWidth: "none",
         }}
-      >
-        <Img
-          src={LOGO_SRC}
-          style={{ width: "100%", height: "100%", objectFit: "contain" }}
-        />
-      </div>
-      <LightSweep
-        delay={sweepDelay ?? delay + 10}
-        duration={38}
-        angle={22}
-        opacity={0.6}
-        width={30}
       />
+      {sweep ? (
+        <LightSweep
+          delay={sweepDelay ?? delay + 4}
+          duration={34}
+          intensity={0.5}
+          width={26}
+          angle={12}
+          specular
+        />
+      ) : null}
     </div>
   );
 };

@@ -1,83 +1,71 @@
-# Remotion video
+# OFF PADEL — Ad Spot
 
-<p align="center">
-  <a href="https://github.com/remotion-dev/logo">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-dark.apng">
-      <img alt="Animated Remotion Logo" src="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-light.gif">
-    </picture>
-  </a>
-</p>
+A 21.5s vertical brand film for OFF Padel, built entirely in
+[Remotion](https://remotion.dev). Output is 1080×1920, 9:16, 30fps, H.264 —
+cut for TikTok, Reels and Meta Ads, and designed to loop.
 
-Welcome to your Remotion project!
+## Running it
 
-## Commands
-
-**Install Dependencies**
-
-```console
+```bash
 npm i
+npm run dev      # Remotion Studio
+npm run render   # out/offpadel-ad.mp4
+npm run audio    # regenerate the soundtrack
+npm run lint     # eslint + tsc
 ```
 
-**Start Preview**
+## The cut
 
-```console
-npm run dev
-```
+Nine shots, timed to a beat map shared by picture and sound.
 
-**Render video**
+| # | Shot | In–Out | Beat |
+|---|------|--------|------|
+| 01 | `IntroHook` | 0.0–0.8 | rumble |
+| 02 | `RacketObsidian` | 0.8–3.0 | **drop** |
+| 03 | `RacketPearl` | 3.0–5.2 | metallic hit |
+| 04 | `ApparelSequence` | 5.2–8.5 | whoosh + 4 beats |
+| 05 | `AccessoriesSequence` | 8.5–11.5 | 5 faster beats |
+| 06 | `PatternInterrupt` | 11.5–13.5 | **cut to silence** |
+| 07 | `HeroComposition` | 13.5–17.0 | **second drop** |
+| 08 | `FinalCta` | 17.0–20.0 | bass rise |
+| 09 | `LoopEnding` | 20.0–21.5 | final impact |
 
-```console
-npx remotion render
-```
+Shot 09 returns the camera to the exact scale and position shot 01 opens on,
+so the last frame and the first frame match (measured seam: 0.13/255) and the
+replay is invisible.
 
-**Upgrade Remotion**
+## Editing it
 
-```console
-npx remotion upgrade
-```
+Everything tunable lives in `src/config/`:
 
-## Captioning
+- `timings.ts` — the cut sheet. Re-time the edit here and every shot, the
+  montage grids and the audio generator follow.
+- `colors.ts` — brand palette.
+- `typography.ts` — type scale, motion curves, platform safe area.
+- `assets.ts` — the asset registry, plus measured focal points on each
+  photograph that drive where the macro pushes converge.
 
-Replace the `sample-video.mp4` with your video file.
-Caption all the videos in you `public` by running the following command:
+Shots are in `src/shots/`, composed from reusable primitives in
+`src/components/` (`CinematicZoom`, `ImageParallax`, `MaskedReveal`,
+`LightSweep`, `BeatCut`, `ProductReveal`, `TextReveal`, `DirectionalBlur`).
 
-```console
-node sub.mjs
-```
+## Product and logo integrity
 
-Only caption a specific video:
+The photography in `public/assets/` is the source of truth. Every shot only
+ever crops, scales, masks and lights those files — no product is redrawn,
+recoloured, reshaped or substituted, and all scaling is uniform so proportions
+cannot drift. The signature is used exactly as delivered; the only treatment is
+a crop of the empty cream margin around the mark so it can be placed as a
+tight plate (`LOGO_CROP` in `config/assets.ts`).
 
-```console
-node sub.mjs <path-to-video-file>
-```
+## Sound
 
-Only caption a specific folder:
+`scripts/generate-audio.mjs` synthesizes the whole track from oscillators and
+filtered noise — no samples, nothing licensed. Its cut sheet mirrors
+`config/timings.ts`, so accents land on picture cuts by construction.
 
-```console
-node sub.mjs <path-to-folder>
-```
+## Fonts
 
-## Configure Whisper.cpp
-
-Captioning will download Whisper.cpp and the 1.5GB big `medium.en` model. To configure which model is being used, you can configure the variables in `whisper-config.mjs`.
-
-### Non-English languages
-
-To support non-English languages, you need to change the `WHISPER_MODEL` variable in `whisper-config.mjs` to a model that does not have a `.en` sufix.
-
-## Docs
-
-Get started with Remotion by reading the [fundamentals page](https://www.remotion.dev/docs/the-fundamentals).
-
-## Help
-
-We provide help on our [Discord server](https://remotion.dev/discord).
-
-## Issues
-
-Found an issue with Remotion? [File an issue here](https://github.com/remotion-dev/remotion/issues/new).
-
-## License
-
-Note that for some entities a company license is needed. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
+Inter is self-hosted in `public/fonts/` and declared in `src/index.css`, rather
+than fetched from Google Fonts at render time — the renderer runs behind a
+TLS-intercepting proxy that headless Chrome does not trust.

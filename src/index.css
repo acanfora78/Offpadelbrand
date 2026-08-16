@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+/*
+ * Inter is served from the project rather than fetched from Google Fonts at
+ * render time: the renderer runs behind a TLS-intercepting proxy that headless
+ * Chrome does not trust, so a live font request fails the frame. Declaring the
+ * face in CSS also lets the browser's own font pipeline load it, which is more
+ * reliable under parallel rendering than constructing a FontFace by hand.
+ */
+@font-face {
+  font-family: "OffPadelDisplay";
+  src: url("./../public/fonts/Inter-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
